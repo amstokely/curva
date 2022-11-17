@@ -3,7 +3,7 @@ project(curva LANGUAGES C CXX CUDA)
 
 set(BUILD_PYTHON ON CACHE BOOL "")
 set(BUILD_TCL ON CACHE BOOL "")
-set(BUILD_DEBUG ON CACHE BOOL "")
+set(BUILD_TESTS ON CACHE BOOL "")
 set(PYTHON_VERSION "" CACHE STRING "")
 set(CONDA_DIR "" CACHE STRING "")
 
@@ -13,7 +13,7 @@ set(SRC_DIR ${ROOT_DIR}/src)
 set(CUDA_SRC_DIR ${SRC_DIR}/cuda)
 set(INCLUDE_DIR ${ROOT_DIR}/include)
 set(LIB_DIR ${ROOT_DIR}/lib)
-set(DEBUG_DIR ${ROOT_DIR}/debug)
+set(TEST_DIR ${ROOT_DIR}/tests)
 set(SWIG_FILES_DIR ${ROOT_DIR}/swig)
 set(TCL_SWIG_FILES_DIR ${SWIG_FILES_DIR}/tcl)
 set(TCL_SWIG_INTERFACE_FILE ${TCL_SWIG_FILES_DIR}/tclcurva.i)
@@ -24,7 +24,9 @@ set(TCL_INCLUDE_DIR ${CONDA_DIR}/include)
 set(PYTHON_LIBRARY ${CONDA_DIR}/bin)
 set(PYTHON_INCLUDE_DIR ${CONDA_DIR}/include/python${PYTHON_VERSION})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DEBUG_DIR})
+install(DIRECTORY DESTINATION ${ROOT_DIR}/lib)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TEST_DIR})
 find_package(boost_filesystem REQUIRED CONFIG)
 
 find_package(Boost REQUIRED COMPONENTS SYSTEM FILESYSTEM)
@@ -134,10 +136,10 @@ if (${BUILD_PYTHON})
     swig_link_libraries(pycurva curva)
 endif ()
 
-if (${BUILD_DEBUG})
+if (${BUILD_TESTS})
     find_package(ZLIB REQUIRED)
-    add_executable(main
-            ${DEBUG_DIR}/main.cpp
+    add_executable(gpu_generalized_correlation_single_window_test
+            ${TEST_DIR}/gpu_generalized_correlation_single_window_test.cpp
             ${SRC_DIR}/curva.cpp
             ${SRC_DIR}/serializer.cpp
             ${SRC_DIR}/calculation.cpp
@@ -156,15 +158,13 @@ if (${BUILD_DEBUG})
             ${SRC_DIR}/coordinates.cpp
             )
     set_target_properties(
-            main PROPERTIES
+            gpu_generalized_correlation_single_window_test PROPERTIES
             CUDA_ARCHITECTURES 70
             CUDA_SEPARABLE_COMPILATION ON
     )
     target_compile_options(
-            main PRIVATE -O3)
-    target_link_libraries(main ${ZLIB_LIBRARIES})
-    target_link_libraries(main /lib/x86_64-linux-gnu/libboost_filesystem.so)
-    target_link_libraries(main /lib/x86_64-linux-gnu/libboost_filesystem.a)
-    target_link_libraries(main /lib/x86_64-linux-gnu/libboost_system.so)
-    target_link_libraries(main /lib/x86_64-linux-gnu/libboost_system.a)
+            gpu_generalized_correlation_single_window_test PRIVATE -O3)
+    target_link_libraries(gpu_generalized_correlation_single_window_test ${ZLIB_LIBRARIES})
+    target_link_libraries(gpu_generalized_correlation_single_window_test ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+    target_link_libraries(gpu_generalized_correlation_single_window_test ${Boost_SYSTEM_LIBRARY_RELEASE})
 endif ()

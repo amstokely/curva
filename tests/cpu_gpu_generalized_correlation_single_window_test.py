@@ -3,7 +3,7 @@ import subprocess
 import numpy as np
 
 
-def mutualInformation(
+def generalizedCorrelation(
         x,
         y,
         numFrames
@@ -73,13 +73,13 @@ for _ in range(100):
     y = np.random.random(3*numFrames)
     np.save('x.npy', x)
     np.save('y.npy', y)
-    corr = mutualInformation(x, y, numFrames)
+    corr = generalizedCorrelation(x, y, numFrames)
     corr = max(0, corr)
     corr = np.sqrt(1 - np.exp(-corr * (2.0 / 3)))
     output = list(map(
         lambda s: float(s),
         subprocess.Popen(
-            ["./main"],
+            ["./gpu_generalized_correlation_single_window_test"],
             stdout=subprocess.PIPE
         ).communicate()[0].decode('utf8').split('\n')[:-1]
     ))
