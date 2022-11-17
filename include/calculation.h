@@ -44,18 +44,13 @@ public:
 			CurvaMatrix<double> *X
 	);
 
-	void mutualInformation (
+	void generalizedCorrelation (
 			int referenceIndex,
 			double cutoff,
-			int k,
-			const std::string& norm
+			int k
 	);
 
-	void pearsonCorrelation (double cutoff);
-
-	CurvaMatrix<double> *mutualInformationMatrix () const;
-
-	CurvaMatrix<double> *pearsonCorrelationMatrix () const;
+	CurvaMatrix<double> *generalizedCorrelationMatrix () const;
 
 	void save (
 			const std::string &fname,
@@ -73,8 +68,7 @@ private:
 	int                 _numAtoms;
 	int                 _numFrames;
 	int                 _windowSize;
-	CurvaMatrix<double> *_mutualInformationMatrix;
-	CurvaMatrix<double> *_pearsonCorrelationMatrix;
+	CurvaMatrix<double> *_generalizedCorrelationMatrix;
 	int                 _numNodes;
 	std::string         _name;
 };

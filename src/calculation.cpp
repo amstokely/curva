@@ -6,7 +6,6 @@
 #include "../include/curva.h"
 #include "../include/cnpy/cnpy.h"
 #include "../include/cuda/mutual_information.h"
-#include "../include/cuda/pearson_correlation.h"
 #include "../include/cuda/cutoff_matrix.h"
 
 #define BOOST_NO_CXX11_SCOPED_ENUMS
@@ -19,17 +18,15 @@
 MolecularDynamicsCalculation::MolecularDynamicsCalculation () {
 	this->_atoms                    = new Atoms;
 	this->_nodes                    = new Nodes;
-	this->XY_                       = new CurvaMatrix<double>;
-	this->_mutualInformationMatrix  = new CurvaMatrix<double>;
-	this->_pearsonCorrelationMatrix = new CurvaMatrix<double>;
+	this->XY_                           = new CurvaMatrix<double>;
+	this->_generalizedCorrelationMatrix = new CurvaMatrix<double>;
 }
 
 MolecularDynamicsCalculation::~MolecularDynamicsCalculation () {
 	delete _atoms;
 	delete _nodes;
 	delete XY_;
-	delete _mutualInformationMatrix;
-	delete _pearsonCorrelationMatrix;
+	delete _generalizedCorrelationMatrix;
 }
 
 void MolecularDynamicsCalculation::init (
@@ -43,9 +40,8 @@ void MolecularDynamicsCalculation::init (
 	auto *coordinates = new Coordinates;
 	this->_atoms                    = new Atoms;
 	this->_nodes                    = new Nodes;
-	this->XY_                       = new CurvaMatrix<double>;
-	this->_mutualInformationMatrix  = new CurvaMatrix<double>;
-	this->_pearsonCorrelationMatrix = new CurvaMatrix<double>;
+	this->XY_                           = new CurvaMatrix<double>;
+	this->_generalizedCorrelationMatrix = new CurvaMatrix<double>;
 	this->_pdb                      = pdb;
 	this->_dcd                      = dcd;
 	this->_numAtoms                 = 0;
@@ -137,19 +133,18 @@ void MolecularDynamicsCalculation::mutualInformationAllocate (
 	);
 }
 
-void MolecularDynamicsCalculation::mutualInformation (
+void MolecularDynamicsCalculation::generalizedCorrelation (
 		int referenceIndex,
 		double cutoff,
-		int k,
-		const std::string &norm
+		int k
 ) {
 	if (!this->XY_->host()) {
 		this->mutualInformationAllocate(
 				this->XY_
 		);
 	}
-	if (!this->_mutualInformationMatrix->host()) {
-		this->_mutualInformationMatrix->init(
+	if (!this->_generalizedCorrelationMatrix->host()) {
+		this->_generalizedCorrelationMatrix->init(
 				this->numNodes(),
 				this->numNodes()
 		);
@@ -184,95 +179,27 @@ void MolecularDynamicsCalculation::mutualInformation (
 				this->_numNodes,
 				this->_windowSize
 		);
-		cudaMutualInformation(
+		cudaGeneralizedCorrelation(
 				this->XY_,
-				this->_mutualInformationMatrix, cutoffMatrix,
+				this->_generalizedCorrelationMatrix, cutoffMatrix,
 				this->numNodes(),
 				this->_windowSize, this->_numFrames, windowIndex,
-				referenceIndex, k, norm
+				referenceIndex, k
 		);
 	}
 	for (unsigned int i           = 0;
 	     i < this->_numNodes;
 	     i++) {
-		(*(this->_mutualInformationMatrix))(referenceIndex, i)
+		(*(this->_generalizedCorrelationMatrix))(referenceIndex, i)
 				/= ((double) this->_numFrames / this->_windowSize);
 	}
 	delete averageNodePositionMatrix;
 	delete cutoffMatrix;
 }
 
-void MolecularDynamicsCalculation::pearsonCorrelation (double cutoff) {
-	auto *deltaAveragePositionMatrix =
-			     new CurvaMatrix<double>;
-	deltaAveragePositionMatrix->init(
-			this->nodes()->numNodes(),
-			this->numFrames()
-	);
-	auto *averageNodePositionMatrix =
-			     new CurvaMatrix<double>;
-	averageNodePositionMatrix->init(
-			3, this->nodes()->numNodes()
-	);
-	auto *cutoffMatrix = new CurvaMatrix<double>;
-	cutoffMatrix->init(
-			this->nodes()->numNodes(),
-			this->nodes()->numNodes()
-	);
-	this->_pearsonCorrelationMatrix->init(
-			this->nodes()->numNodes(),
-			this->nodes()->numNodes()
-	);
-	deltaAveragePositionMatrix->allocate();
-	this->_pearsonCorrelationMatrix->allocate();
-	averageNodePositionMatrix->allocate();
-	cutoffMatrix->allocate();
-	for (unsigned int windowIndex = 0;
-	     windowIndex < this->_numFrames / this->_windowSize;
-	     windowIndex++) {
-
-
-		auto nodesIterator = this->nodes()->begin();
-		while (nodesIterator != this->nodes()->end()) {
-			curva::pearsonCorrelationConstruct(
-					*nodesIterator,
-					deltaAveragePositionMatrix,
-					averageNodePositionMatrix, windowIndex,
-					this->_windowSize
-			);
-			nodesIterator++;
-		}
-		cudaCutoffMatrix(
-				averageNodePositionMatrix,
-				cutoffMatrix,
-				cutoff,
-				this->nodes()->numNodes(),
-				this->_windowSize
-		);
-		cudaPearsonCorrelation(
-				deltaAveragePositionMatrix,
-				this->_pearsonCorrelationMatrix,
-				cutoffMatrix,
-				this->nodes()->numNodes(),
-				this->_windowSize
-		);
-	}
-	for (auto         &val: *this->_pearsonCorrelationMatrix) {
-		val /= ((double) this->_numFrames / this->_windowSize);
-	}
-	delete deltaAveragePositionMatrix;
-	delete averageNodePositionMatrix;
-	delete cutoffMatrix;
-}
-
 CurvaMatrix<double> *
-MolecularDynamicsCalculation::mutualInformationMatrix () const {
-	return this->_mutualInformationMatrix;
-}
-
-CurvaMatrix<double> *
-MolecularDynamicsCalculation::pearsonCorrelationMatrix () const {
-	return this->_pearsonCorrelationMatrix;
+MolecularDynamicsCalculation::generalizedCorrelationMatrix () const {
+	return this->_generalizedCorrelationMatrix;
 }
 
 void MolecularDynamicsCalculation::save (

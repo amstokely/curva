@@ -7,7 +7,6 @@
 #include <cmath>
 #include "../include/dcd/dcd.h"
 #include "../include/utils.h"
-#include "../include/cuda/pearson_correlation.h"
 #include "../include/cuda/mutual_information.h"
 
 void curva::parsePdb (
@@ -117,46 +116,6 @@ void curva::generateNodes (
 	}
 }
 
-void curva::pearsonCorrelationConstruct (
-		Node *node,
-		CurvaMatrix<double> *deltaAveragePositionMatrix,
-		CurvaMatrix<double> *averagePositionMatrix,
-		unsigned int windowIndex,
-		unsigned int windowSize
-) {
-	unsigned int frame = 0;
-	double       avgX  = node->averageCenterOfMass().at(
-			3 * windowIndex
-	);
-	double       avgY  = node->averageCenterOfMass().at(
-			3 * windowIndex + 1
-	);
-	double       avgZ  = node->averageCenterOfMass().at(
-			3 * windowIndex + 2
-	);
-	(*(averagePositionMatrix))(0, node->index()) = avgX;
-	(*(averagePositionMatrix))(1, node->index()) = avgY;
-	(*(averagePositionMatrix))(2, node->index()) = avgZ;
-	for (int i = 0;
-	     i < node->centerOfMass().size();
-	     i += 3) {
-		double x                 = node->centerOfMass().at(i);
-		double y                 = node->centerOfMass().at(i + 1);
-		double z                 = node->centerOfMass().at(i + 2);
-		double deltaX            = x - avgX;
-		double deltaY            = y - avgY;
-		double deltaZ            = z - avgZ;
-		double comAvgComDistance = sqrt(
-				pow(deltaX, 2.0)
-				+ pow(deltaY, 2.0)
-				+ pow(deltaZ, 2.0)
-		);
-		(*(deltaAveragePositionMatrix))(node->index(), frame)
-				= comAvgComDistance;
-		frame += 1;
-	}
-}
-
 void curva::mutualInformationConstruct (
 		Node *node,
 		CurvaMatrix<double> *averagePositionMatrix,
@@ -177,7 +136,7 @@ void curva::mutualInformationConstruct (
 	(*(averagePositionMatrix))(2, node->index()) = avgZ;
 }
 
-void curva::test::mutualInformationTest (
+void curva::test::generalizedCorrelationTest (
 		CurvaMatrix<double> *mutualInformationMatrix,
 		const std::string &xfname,
 		const std::string &yfname,
@@ -240,13 +199,14 @@ void curva::test::mutualInformationTest (
 
 	XY->allocate();
 	XY->toDevice();
-	cudaMutualInformation(
+	cudaGeneralizedCorrelation(
 			XY,
 			mutualInformationMatrix, cutoffMatrix,
 			numNodes,
 			1024, numFrames,
 			0,
-			referenceIndex, k, std::string());
+			referenceIndex, k
+	);
 	XY->deallocate();
 
 	delete XY;

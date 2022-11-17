@@ -18,14 +18,13 @@ calculation.init(
     name=f'1pgb',
 )
 for nodeIndex in range(calculation.numNodes()):
-    calculation.mutualInformation(
+    calculation.generalizedCorrelation(
         referenceIndex=nodeIndex,
         k=8,
         cutoff=20.0,
     )
-    mi = calculation.mutualInformationMatrix()[nodeIndex]
-    idx = mi.argsortDescendingAbs()
-    for i in idx[:1]:
-        print(mi[i], calculation.nodes()[i], nodeIndex)
+    gencor = calculation.generalizedCorrelationMatrix()[nodeIndex]
+    idx = gencor.argsortDescendingAbs()
+    for i in idx[:10]:
+        print(gencor[i], calculation.nodes()[i], nodeIndex)
     print('')
-calculation.mutualInformationMatrix().save("mi.npy")

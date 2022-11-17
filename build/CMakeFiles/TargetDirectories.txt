@@ -1,6 +1,0 @@
-/home/andy/CLionProjects/curva/build/CMakeFiles/curva.dir
-/home/andy/CLionProjects/curva/build/CMakeFiles/pycurva.dir
-/home/andy/CLionProjects/curva/build/CMakeFiles/pycurva_swig_compilation.dir
-/home/andy/CLionProjects/curva/build/CMakeFiles/main.dir
-/home/andy/CLionProjects/curva/build/CMakeFiles/edit_cache.dir
-/home/andy/CLionProjects/curva/build/CMakeFiles/rebuild_cache.dir

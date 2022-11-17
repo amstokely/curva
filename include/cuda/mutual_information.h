@@ -7,17 +7,16 @@
 
 #include "../matrix/curva_matrix.h"
 
-void cudaMutualInformation (
+void cudaGeneralizedCorrelation (
 		CurvaMatrix<double> *XY,
-		CurvaMatrix<double> *mutualInformationMatrix,
+		CurvaMatrix<double> *generalizedCorrelationMatrix,
 		CurvaMatrix<double> *cutoffMatrix,
 		int numNodes,
 		int numFrames,
 		unsigned int totalNumFrames,
 		unsigned int firstFrame,
 		unsigned int referenceIndex,
-		int k,
-		const std::string& norm
+		int k
 );
 
 void cudaNormalizeNodeCoordinates (

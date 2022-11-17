@@ -29,14 +29,6 @@ namespace curva {
 			unsigned int numWindows
 	);
 
-	void pearsonCorrelationConstruct (
-			Node *node,
-			CurvaMatrix<double> *deltaAveragePositionMatrix,
-			CurvaMatrix<double> *averagePositionMatrix,
-			unsigned int windowIndex,
-			unsigned int windowSize
-	);
-
 	void mutualInformationConstruct (
 			Node *node,
 			CurvaMatrix<double> *averagePositionMatrix,
@@ -45,7 +37,7 @@ namespace curva {
 	);
 
 	namespace test {
-		void mutualInformationTest (
+		void generalizedCorrelationTest (
 				CurvaMatrix<double> *mutualInformationMatrix,
 				const std::string &xfname,
 				const std::string &yfname,

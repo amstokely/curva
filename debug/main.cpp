@@ -10,15 +10,15 @@ int main () {
 	std::string yfname = "./y.npy";
 	std::string xfname = "./x.npy";
 
-	auto *mutualInformationMatrix = new CurvaMatrix<double>;
-	curva::test::mutualInformationTest(
-			mutualInformationMatrix,
+	auto *generalizedCorrelationMatrix = new CurvaMatrix<double>;
+	curva::test::generalizedCorrelationTest(
+			generalizedCorrelationMatrix,
 			xfname,
 			yfname, 0
 	);
-	for (auto val: *mutualInformationMatrix) {
+	for (auto val: *generalizedCorrelationMatrix) {
 		std::cout << val << std::endl;
 	}
-	delete mutualInformationMatrix;
+	delete generalizedCorrelationMatrix;
 	return 0;
 }

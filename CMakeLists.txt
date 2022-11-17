@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 project(curva LANGUAGES C CXX CUDA)
 
-set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
-set(BUILD_PYTHON ON)
-set(BUILD_TCL OFF)
-set(BUILD_DEBUG ON)
+set(BUILD_PYTHON ON CACHE BOOL "")
+set(BUILD_TCL ON CACHE BOOL "")
+set(BUILD_DEBUG ON CACHE BOOL "")
+set(PYTHON_VERSION "" CACHE STRING "")
+set(CONDA_DIR "" CACHE STRING "")
 
 set(Boost_USE_STATIC_LIBS ON)
 set(ROOT_DIR ${CMAKE_SOURCE_DIR})
@@ -18,16 +19,13 @@ set(TCL_SWIG_FILES_DIR ${SWIG_FILES_DIR}/tcl)
 set(TCL_SWIG_INTERFACE_FILE ${TCL_SWIG_FILES_DIR}/tclcurva.i)
 set(PYTHON_SWIG_FILES_DIR ${SWIG_FILES_DIR}/python)
 set(PYTHON_SWIG_INTERFACE_FILE ${PYTHON_SWIG_FILES_DIR}/pycurva.i)
-set(CONDA_DIR /home/andy/miniconda3/envs/curva)
-set(NUMPY_INCLUDE_DIR ${CONDA_DIR}/lib/python3.10/site-packages/numpy/core/include)
+set(NUMPY_INCLUDE_DIR ${CONDA_DIR}/lib/python${PYTHON_VERSION}/site-packages/numpy/core/include)
 set(TCL_INCLUDE_DIR ${CONDA_DIR}/include)
 set(PYTHON_LIBRARY ${CONDA_DIR}/bin)
-set(PYTHON_INCLUDE_DIR ${CONDA_DIR}/include/python3.10)
+set(PYTHON_INCLUDE_DIR ${CONDA_DIR}/include/python${PYTHON_VERSION})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DEBUG_DIR})
-find_package(boost_filesystem 1.71.0 REQUIRED CONFIG)
-
-find_package(Eigen3 REQUIRED)
+find_package(boost_filesystem REQUIRED CONFIG)
 
 find_package(Boost REQUIRED COMPONENTS SYSTEM FILESYSTEM)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -47,7 +45,6 @@ list(APPEND TCL_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
 list(APPEND TCL_INCLUDE_DIRS ${TCL_INCLUDE_DIR})
 list(APPEND TCL_INCLUDE_DIRS ${ROOT_DIR}/include/json/include)
 
-set(SWIG_EXECUTABLE /home/andy/miniconda3/envs/curva/bin/swig)
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 set_source_files_properties(${TCL_SWIG_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
@@ -62,7 +59,6 @@ add_library(curva SHARED
         ${SRC_DIR}/utils.cpp
         ${SRC_DIR}/dcd/dcd.cpp
         ${SRC_DIR}/cnpy/cnpy.cpp
-        ${CUDA_SRC_DIR}/pearson_correlation.cu
         ${CUDA_SRC_DIR}/cudautils.cpp
         ${CUDA_SRC_DIR}/mutual_information.cu
         ${CUDA_SRC_DIR}/cutoff_matrix.cu
@@ -153,7 +149,6 @@ if (${BUILD_DEBUG})
             ${SRC_DIR}/nodes.cpp
             ${SRC_DIR}/cnpy/cnpy.cpp
             ${CUDA_SRC_DIR}/mutual_information.cu
-            ${CUDA_SRC_DIR}/pearson_correlation.cu
             ${CUDA_SRC_DIR}/cutoff_matrix.cu
             ${CUDA_SRC_DIR}/cudautils.cpp
             ${SRC_DIR}/atom.cpp
