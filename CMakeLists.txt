@@ -7,7 +7,6 @@ set(BUILD_TESTS ON CACHE BOOL "")
 set(PYTHON_VERSION "" CACHE STRING "")
 set(CONDA_DIR "" CACHE STRING "")
 
-set(Boost_USE_STATIC_LIBS ON)
 set(ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(SRC_DIR ${ROOT_DIR}/src)
 set(CUDA_SRC_DIR ${SRC_DIR}/cuda)
@@ -75,13 +74,10 @@ target_compile_options(curva PRIVATE -O3)
 set_target_properties(curva PROPERTIES
         OUTPUT_DIRECTORY ${LIB_DIR}
         LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
-        CUDA_ARCHITECTURES 70
         CUDA_SEPARABLE_COMPILATION ON
         )
-target_link_libraries(curva /lib/x86_64-linux-gnu/libboost_filesystem.so)
-target_link_libraries(curva /lib/x86_64-linux-gnu/libboost_filesystem.a)
-target_link_libraries(curva /lib/x86_64-linux-gnu/libboost_system.so)
-target_link_libraries(curva /lib/x86_64-linux-gnu/libboost_system.a)
+target_link_libraries(curva ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+target_link_libraries(curva ${Boost_SYSTEM_LIBRARY_RELEASE})
 
 
 if (${BUILD_TCL})
@@ -102,7 +98,6 @@ if (${BUILD_TCL})
     target_compile_options(tclcurva PRIVATE -O3)
     set_target_properties(
             tclcurva PROPERTIES
-            CUDA_ARCHITECTURES 70
             CUDA_SEPARABLE_COMPILATION ON
             INCLUDE_DIRECTORIES "${TCL_INCLUDE_DIRS}"
             LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
@@ -127,7 +122,6 @@ if (${BUILD_PYTHON})
     target_compile_options(pycurva PRIVATE -O3)
     set_target_properties(
             pycurva PROPERTIES
-            CUDA_ARCHITECTURES 70
             CUDA_SEPARABLE_COMPILATION ON
             INCLUDE_DIRECTORIES "${PYTHON_INCLUDE_DIRS}"
             LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
@@ -159,7 +153,6 @@ if (${BUILD_TESTS})
             )
     set_target_properties(
             gpu_generalized_correlation_single_window_test PROPERTIES
-            CUDA_ARCHITECTURES 70
             CUDA_SEPARABLE_COMPILATION ON
     )
     target_compile_options(
