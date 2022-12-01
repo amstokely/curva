@@ -28,7 +28,7 @@
 #ifndef CURVA_ELEMENT_H
 #define CURVA_ELEMENT_H
 
-class ElementProperties {
+class ChemicalProperties {
 public:
 	double atomicWeight (
 			const std::string &
@@ -38,7 +38,10 @@ public:
 	}
 
 private:
-	std::map<std::string, double> _atomicWeights = {
+	std::map<
+			std::string,
+			double
+	        > _atomicWeights = {
 			{"H",  0.001007940},
 			{"He", 0.004002602},
 			{"Li", 0.006941000},

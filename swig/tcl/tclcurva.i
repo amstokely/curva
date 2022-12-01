@@ -24,9 +24,13 @@
 
 %include std_string.i
 %include std_vector.i
+%include std_map.i
 %template(dVector) std::vector<double>;
+%template(sdMap) std::map<std::string, double>;
+%template(ssdMap) std::map<std::string, std::string>;
 %template(ddVector) std::vector<std::vector<double>>;
 %template(iVector) std::vector<int>;
+
 
 %include "tclcurva_headers1.i"
 %include "tclcurva_rename.i"

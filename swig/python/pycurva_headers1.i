@@ -37,4 +37,5 @@
 #include "../../../include/nodes.h"
 #include "../../../include/coordinates.h"
 #include "../../../include/cnpy/cnpy.h"
+#include "../../../include/chemical_properties.h"
 %}

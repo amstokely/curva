@@ -25,7 +25,23 @@
 
 #include "calculation.h"
 
+/*!
+@brief CuRva namespace
+*/
 namespace curva {
+	/*!
+	 * Extracts the atomic coordinates from a DCD file.
+	 * @param fname DCD file name.
+	 * @param coordinates Pointer to a Coordinates class object,
+	 * which is where the parsed atomic coordinates are saved.
+	 * @param numAtoms Number of atoms in a single trajectory frame.
+	 * @param numFrames Total number of frames to be read from the
+	 * dcd file.
+	 * @param firstFrame Index of the first frame to be read from the
+	 * dcd file
+	 * @param lastFrame Index of the last frame to be read from the
+	 * dcd file
+	 */
 	void parseDcd (
 			const std::string &fname,
 			Coordinates *coordinates,
@@ -35,11 +51,24 @@ namespace curva {
 			int lastFrame = -1
 	);
 
+	/*!
+	 * Extracts all atomic information from the first frame of a PDB
+	 * file.
+	 * @param fname PDB file name.
+	 * @param atoms Pointer to an Atoms class object, which is where
+	 * the parsed atomic information is saved.
+	 */
 	void parsePdb (
 			const std::string &fname,
 			Atoms *atoms
 	);
 
+	/*!
+	 * @param nodes
+	 * @param atoms
+	 * @param coordinates
+	 * @param numWindows
+	 */
 	void generateNodes (
 			Nodes *nodes,
 			Atoms *atoms,
@@ -47,6 +76,13 @@ namespace curva {
 			unsigned int numWindows
 	);
 
+	/*!
+	 *
+	 * @param node
+	 * @param averagePositionMatrix
+	 * @param windowIndex
+	 * @param windowSize
+	 */
 	void mutualInformationConstruct (
 			Node *node,
 			CurvaMatrix<double> *averagePositionMatrix,
@@ -54,6 +90,7 @@ namespace curva {
 			unsigned int windowSize
 	);
 
+#ifndef DOXYGEN_IGNORE
 	namespace test {
 		void generalizedCorrelationTest (
 				CurvaMatrix<double> *mutualInformationMatrix,
@@ -62,7 +99,8 @@ namespace curva {
 				unsigned int referenceIndex
 		);
 	}
-
+#endif //DOXYGEN_IGNORE
 }
+
 
 #endif //CURVA_CURVA_H

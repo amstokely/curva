@@ -25,7 +25,7 @@
 #include <sstream>
 #include <algorithm>
 #include "../include/atom.h"
-#include "../include/element_properties.h"
+#include "../include/chemical_properties.h"
 #include "../include/utils.h"
 
 
@@ -53,7 +53,7 @@
 Atom::Atom () = default;
 
 Atom::Atom (std::string &pdbLine) {
-	ElementProperties elementProperties;
+	ChemicalProperties chemicalProperties;
 	_serial            = utils::strToInt(
 			utils::removeWhiteSpace(
 					pdbLine.substr(6, 5)
@@ -97,7 +97,6 @@ Atom::Atom (std::string &pdbLine) {
 				return std::tolower(c);
 			}
 	);
-
 	this->_element[0] = std::toupper(this->_element[0]);
 	this->_tag  = (
 			this->_residueName + "_" +
@@ -106,7 +105,64 @@ Atom::Atom (std::string &pdbLine) {
 			this->_segmentId
 	);
 	this->_mass = 1000.0
-	              * elementProperties.atomicWeight(this->_element);
+	              * chemicalProperties.atomicWeight(this->_element);
+	std::stringstream hashStringStream;
+	hashStringStream << this->_index << "_" << this->_tag;
+	this->_hash = utils::hashString(
+			hashStringStream.str()
+	);
+}
+
+Atom::Atom (std::string &pdbLine, int atomIndex) {
+	ChemicalProperties chemicalProperties;
+	_serial = atomIndex + 1;
+	_index             = atomIndex;
+	_name              = utils::removeWhiteSpace(
+			pdbLine.substr(12, 3)
+	);
+	_residueName       = utils::removeWhiteSpace(
+			pdbLine.substr(17, 3)
+	);
+	_chainId           = utils::removeWhiteSpace(pdbLine.substr(21, 1));
+	_residueId         = utils::strToInt(
+			utils::removeWhiteSpace(
+					pdbLine.substr(22, 4)
+			)
+	);
+	_occupancy         = utils::strToDouble(
+			utils::removeWhiteSpace(
+					pdbLine.substr(54, 6)
+			)
+	);
+	_temperatureFactor = utils::strToDouble(
+			utils::removeWhiteSpace(
+					pdbLine.substr(54, 6)
+			)
+	);
+	_segmentId         = utils::removeWhiteSpace(
+			pdbLine.substr(72, 4)
+	);
+	utils::removeWhiteSpace(_segmentId);
+	_element = utils::removeWhiteSpace(
+			pdbLine.substr(76, 2)
+	);
+	std::transform(
+			std::begin(this->_element),
+			std::end(this->_element),
+			std::begin(this->_element), []
+					(char const &c) {
+				return std::tolower(c);
+			}
+	);
+	this->_element[0] = std::toupper(this->_element[0]);
+	this->_tag  = (
+			this->_residueName + "_" +
+			utils::removeWhiteSpace(pdbLine.substr(22, 4)) + "_" +
+			this->_chainId + "_" +
+			this->_segmentId
+	);
+	this->_mass = 1000.0
+	              * chemicalProperties.atomicWeight(this->_element);
 	std::stringstream hashStringStream;
 	hashStringStream << this->_index << "_" << this->_tag;
 	this->_hash = utils::hashString(

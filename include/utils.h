@@ -30,27 +30,70 @@
 
 #include <string>
 
+/*!
+@brief utils namespace
+*/
 namespace utils {
+	/*!
+	 *
+	 * @param lastFrame
+	 * @param numFrames
+	 */
 	void setLastFrame (
 			int *lastFrame,
 			int numFrames
 	);
 
+	/*!
+	 *
+	 * @param indicesArray
+	 * @param size
+	 */
 	void generateIndicesArray (
 			unsigned int **indicesArray,
 			int size
 	);
 
+	/*!
+	 *
+	 * @param pdbLine
+	 * @return
+	 */
 	bool isRecordAtom (std::string &pdbLine);
 
+	/*!
+	 *
+	 * @param pdbLine
+	 * @return
+	 */
 	bool isEndOfFrame (std::string &pdbLine);
 
+	/*!
+	 *
+	 * @param str
+	 * @return
+	 */
 	double strToDouble (const std::string &str);
 
+	/*!
+	 *
+	 * @param str
+	 * @return
+	 */
 	int strToInt (const std::string &str);
 
+	/*!
+	 *
+	 * @param str
+	 * @return
+	 */
 	std::string removeWhiteSpace (std::string str);
 
+	/*!
+	 *
+	 * @param str
+	 * @return
+	 */
 	unsigned int hashString (const std::string &str);
 
 }

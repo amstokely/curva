@@ -34,3 +34,4 @@
 %include ../../../include/custom_iterators/random_access_iterator.h
 %include ../../../include/custom_iterators/forward_iterator.h
 %include ../../../include/custom_iterators/map_value_forward_iterator.h
+%include ../../../include/chemical_properties.h
