@@ -11,6 +11,8 @@ set(SRC_DIR ${ROOT_DIR}/src)
 set(CUDA_SRC_DIR ${SRC_DIR}/cuda)
 set(INCLUDE_DIR ${ROOT_DIR}/include)
 set(LIB_DIR ${ROOT_DIR}/lib)
+set(PYCURVA_DIR ${ROOT_DIR}/wrappers/pycurva/pycurva)
+set(TCLCURVA_DIR ${ROOT_DIR}/wrappers/tclcurva)
 set(TEST_DIR ${ROOT_DIR}/tests)
 set(SWIG_FILES_DIR ${ROOT_DIR}/swig)
 set(TCL_SWIG_FILES_DIR ${SWIG_FILES_DIR}/tcl)
@@ -19,8 +21,6 @@ set(PYTHON_SWIG_FILES_DIR ${SWIG_FILES_DIR}/python)
 set(PYTHON_SWIG_INTERFACE_FILE ${PYTHON_SWIG_FILES_DIR}/pycurva.i)
 set(TCL_INCLUDE_DIR ${CONDA_DIR}/include)
 set(PYTHON_LIBRARY ${CONDA_DIR}/bin)
-
-install(DIRECTORY DESTINATION ${ROOT_DIR}/lib)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TEST_DIR})
 find_package(boost_filesystem REQUIRED CONFIG)
@@ -43,7 +43,6 @@ list(APPEND PYTHON_INCLUDE_DIRS ${ROOT_DIR}/include/json/include)
 list(APPEND TCL_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
 list(APPEND TCL_INCLUDE_DIRS ${TCL_INCLUDE_DIR})
 list(APPEND TCL_INCLUDE_DIRS ${ROOT_DIR}/include/json/include)
-include(CMakePrintHelpers)
 
 
 find_package(SWIG REQUIRED)
@@ -94,13 +93,13 @@ if (${BUILD_TCL})
             ${SRC_DIR}/atoms.cpp
             ${SRC_DIR}/coordinates.cpp
             ${SRC_DIR}/cnpy/cnpy.cpp
-            OUTPUT_DIR ${LIB_DIR})
+            OUTPUT_DIR ${TCLCURVA_DIR})
     target_compile_options(tclcurva PRIVATE -O3)
     set_target_properties(
             tclcurva PROPERTIES
             CUDA_SEPARABLE_COMPILATION ON
             INCLUDE_DIRECTORIES "${TCL_INCLUDE_DIRS}"
-            LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
+            LIBRARY_OUTPUT_DIRECTORY ${TCLCURVA_DIR}
     )
     swig_link_libraries(tclcurva curva)
 endif ()
@@ -118,13 +117,13 @@ if (${BUILD_PYTHON})
             ${SRC_DIR}/nodes.cpp
             ${SRC_DIR}/coordinates.cpp
             ${SRC_DIR}/cnpy/cnpy.cpp
-            OUTPUT_DIR ${LIB_DIR})
+            OUTPUT_DIR ${PYCURVA_DIR})
     target_compile_options(pycurva PRIVATE -O3)
     set_target_properties(
             pycurva PROPERTIES
             CUDA_SEPARABLE_COMPILATION ON
             INCLUDE_DIRECTORIES "${PYTHON_INCLUDE_DIRS}"
-            LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
+            LIBRARY_OUTPUT_DIRECTORY ${PYCURVA_DIR}
     )
     swig_link_libraries(pycurva ${CONDA_DIR}/lib/libz.so)
     swig_link_libraries(pycurva curva)
